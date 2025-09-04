@@ -2,24 +2,23 @@ package com.example.spba.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.spba.dao.AdminMapper;
 import com.example.spba.domain.entity.Admin;
 import com.example.spba.domain.entity.LoginLog;
 import com.example.spba.domain.entity.Role;
-import com.example.spba.dao.AdminMapper;
 import com.example.spba.service.AdminService;
 import com.example.spba.service.LoginLogService;
 import com.example.spba.service.MenuService;
 import com.example.spba.service.RoleService;
+import com.example.spba.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements AdminService
@@ -129,9 +128,47 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
         return menus;
     }
+// 注册
+@Override
+public boolean register(Map<String, Object> params) {
+    String username = (String) params.get("username");
+    String password = (String) params.get("password");
+    String identityNumber = (String) params.get("identity_number");
+
+    if (username == null || password == null || identityNumber == null) {
+        throw new RuntimeException("缺少必要参数");
+    }
+
+    // 用户名唯一校验
+    long count1 = this.count(new QueryWrapper<Admin>().eq("username", username));
+    if (count1 > 0) {
+        throw new RuntimeException("用户名已存在");
+    }
+
+    // 唯一识别号唯一校验
+    long count2 = this.count(new QueryWrapper<Admin>().eq("identity_number", identityNumber));
+    if (count2 > 0) {
+        throw new RuntimeException("唯一识别号已存在");
+    }
+
+    // 构建 Admin
+    Admin admin = new Admin();
+    admin.setUsername(username);
+
+    // 生成 4 位随机 salt
+    String safe = String.valueOf(System.currentTimeMillis()).substring(8, 12);
+    admin.setSafe(safe);
+    admin.setPassword(DigestUtils.md5DigestAsHex((password + safe).getBytes()));
+
+    admin.setIdentity_number(identityNumber);
+    admin.setStatus(1);
+    admin.setRole(JSONUtil.parse("[3]").toString());
 
 
-
+    //调用文件存储
+    FileUtils.createUserFolder(admin.getIdentity_number());
+    return this.save(admin);
+}
 
 
     private void updateLogin(Long id, String ip)

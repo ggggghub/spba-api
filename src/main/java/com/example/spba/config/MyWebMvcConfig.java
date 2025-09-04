@@ -27,6 +27,7 @@ public class MyWebMvcConfig implements WebMvcConfigurer
         // 注册拦截器
         registry.addInterceptor(spbaInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login");
+                .excludePathPatterns("/login")
+                .excludePathPatterns("/register");
     }
 }

@@ -6,6 +6,7 @@ import com.example.spba.domain.entity.Admin;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface AdminService extends IService<Admin>
 {
@@ -49,7 +50,7 @@ public interface AdminService extends IService<Admin>
     //void registerAdmin(String username, String password, String identityNumber);
 
     /**
-     * 根据字段获取 Admin
+     * 注册
      */
-
+    boolean register(Map<String, Object> params);
  }

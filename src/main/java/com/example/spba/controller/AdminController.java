@@ -5,8 +5,8 @@ import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.spba.domain.entity.Admin;
 import com.example.spba.domain.dto.AdminDTO;
+import com.example.spba.domain.entity.Admin;
 import com.example.spba.service.AdminService;
 import com.example.spba.service.RoleService;
 import com.example.spba.utils.Function;
@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Validated
@@ -113,21 +110,15 @@ public class AdminController
         return R.success();
     }
     //用户注册
-//    @PostMapping("/register")
-//    public R register(@RequestParam String username,
-//                      @RequestParam String password,
-//                      @RequestParam String identity_number) {
-//        try {
-//            adminService.registerAdmin(username, password, identity_number);
-//            return R.success("注册成功");
-//        } catch (BusinessException e) {
-//            return R.error(e.getMessage());
-//        } catch (Exception e) {
-//            return R.error("注册失败，请重试");
-//        }
-//    }
-//
-//    }
+    @PostMapping("/register")
+    public R register(@RequestBody Map<String, Object> params) {
+        try {
+            boolean res = adminService.register(params);
+            return res ? R.success("注册成功") : R.error("注册失败");
+        } catch (RuntimeException e) {
+            return R.error(e.getMessage());
+        }
+    }
 
     /**
      * 编辑管理员
