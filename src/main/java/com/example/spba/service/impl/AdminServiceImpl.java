@@ -160,13 +160,13 @@ public boolean register(Map<String, Object> params) {
     admin.setSafe(safe);
     admin.setPassword(DigestUtils.md5DigestAsHex((password + safe).getBytes()));
 
-    admin.setIdentity_number(identityNumber);
+    admin.setIdentityNumber(identityNumber);
     admin.setStatus(1);
     admin.setRole(JSONUtil.parse("[3]").toString());
 
 
     //调用文件存储
-    FileUtils.createUserFolder(admin.getIdentity_number());
+    FileUtils.createUserFolder(admin.getIdentityNumber());
     return this.save(admin);
 }
 
@@ -175,13 +175,13 @@ public boolean register(Map<String, Object> params) {
     {
         Admin update = new Admin();
         update.setId(id);
-        update.setLogin_ip(ip);
-        update.setLogin_time(new Date());
+        update.setLoginIp(ip);
+        update.setLoginTime(new Date());
         this.baseMapper.updateById(update);
 
         LoginLog log = new LoginLog();
-        log.setAdmin_id(Integer.valueOf(id.toString()));
-        log.setLogin_ip(ip);
+        log.setAdminId(Integer.valueOf(id.toString()));
+        log.setLoginIp(ip);
         loginLogService.save(log);
     }
 }

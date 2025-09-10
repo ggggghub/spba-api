@@ -21,7 +21,7 @@ public class Role implements Serializable
     private Integer root;
     private Integer status;
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date update_time;
+    private Date updateTime;
     @TableField(fill = FieldFill.INSERT)
-    private Date create_time;
+    private Date createTime;
 }

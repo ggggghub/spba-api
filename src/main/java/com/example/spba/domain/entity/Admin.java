@@ -23,11 +23,11 @@ public class Admin implements Serializable
     private String avatar;
     private Integer status;
     private String safe;
-    private String login_ip;
-    private Date login_time;
+    private String loginIp;
+    private Date loginTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date update_time;
+    private Date updateTime;
     @TableField(fill = FieldFill.INSERT)
-    private Date create_time;
-    private String identity_number;
+    private Date createTime;
+    private String identityNumber;
 }

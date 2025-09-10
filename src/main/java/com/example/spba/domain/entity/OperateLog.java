@@ -16,12 +16,12 @@ public class OperateLog implements Serializable
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Integer admin_id;
+    private Integer adminId;
     private String username;
     private String url;
     private String method;
     private String params;
     private String ip;
     @TableField(fill = FieldFill.INSERT)
-    private Date create_time;
+    private Date createTime;
 }

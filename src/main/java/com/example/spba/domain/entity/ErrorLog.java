@@ -22,5 +22,5 @@ public class ErrorLog implements Serializable
     private String message;
     private String exception;
     @TableField(fill = FieldFill.INSERT)
-    private Date create_time;
+    private Date createTime;
 }

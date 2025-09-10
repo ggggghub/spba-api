@@ -16,8 +16,8 @@ public class LoginLog implements Serializable
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Integer admin_id;
-    private String login_ip;
+    private Integer adminId;
+    private String loginIp;
     @TableField(fill = FieldFill.INSERT)
-    private Date create_time;
+    private Date createTime;
 }

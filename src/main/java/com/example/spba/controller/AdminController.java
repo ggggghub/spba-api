@@ -13,6 +13,10 @@ import com.example.spba.utils.Function;
 import com.example.spba.utils.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.DigestUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +24,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 
 @Validated
 @RestController
-public class AdminController
-{
+public class AdminController {
 
     @Autowired
     private AdminService adminService;
@@ -36,6 +43,7 @@ public class AdminController
 
     /**
      * 获取管理员列表
+     *
      * @param username
      * @param role
      * @param status
@@ -46,8 +54,7 @@ public class AdminController
     @GetMapping("/admins")
     public R getAdminList(String username, Integer role, Integer status,
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
-                          @RequestParam(name = "size", defaultValue = "15") Integer size)
-    {
+                          @RequestParam(name = "size", defaultValue = "15") Integer size) {
         HashMap where = new HashMap();
         where.put("username", username);
         where.put("role", role);
@@ -61,12 +68,12 @@ public class AdminController
 
     /**
      * 获取管理员详情
+     *
      * @param adminId
      * @return
      */
     @GetMapping("/admin/{id}")
-    public R getAdminInfo(@PathVariable("id") @Min(value = 1, message = "参数错误") Integer adminId)
-    {
+    public R getAdminInfo(@PathVariable("id") @Min(value = 1, message = "参数错误") Integer adminId) {
         HashMap data = new HashMap();
         Admin info = adminService.getById(adminId);
         if (info != null) {
@@ -81,12 +88,12 @@ public class AdminController
 
     /**
      * 新增管理员
+     *
      * @param form
      * @return
      */
     @PostMapping("/admin")
-    public R addAdmin(@Validated(AdminDTO.Save.class) AdminDTO form)
-    {
+    public R addAdmin(@Validated(AdminDTO.Save.class) AdminDTO form) {
         // 验证角色（不允许添加超管，超管是默认生成的，唯一）
         Boolean res = roleService.checkRole(form.getRole_ids());
         if (res.equals(false)) {
@@ -109,6 +116,7 @@ public class AdminController
 
         return R.success();
     }
+
     //用户注册
     @PostMapping("/register")
     public R register(@RequestBody Map<String, Object> params) {
@@ -122,12 +130,12 @@ public class AdminController
 
     /**
      * 编辑管理员
+     *
      * @param form
      * @return
      */
     @PutMapping("/admin")
-    public R editAdmin(@Validated(AdminDTO.Update.class) AdminDTO form)
-    {
+    public R editAdmin(@Validated(AdminDTO.Update.class) AdminDTO form) {
         // 不允许编辑超管
         HashMap where = new HashMap<>();
         where.put("id", form.getId());
@@ -149,7 +157,7 @@ public class AdminController
 
         if (form.getPassword().length() > 0) {
             String pattern = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d\\W]{6,18}$";
-            if (!Pattern.matches(pattern , form.getPassword())) {
+            if (!Pattern.matches(pattern, form.getPassword())) {
                 return R.error("密码必须包含字母和数字，且在6-18位之间");
             }
             admin.setSafe(Function.getRandomString(4));
@@ -169,12 +177,12 @@ public class AdminController
 
     /**
      * 删除管理员
+     *
      * @param adminId
      * @return
      */
     @DeleteMapping("/admin/{id}")
-    public R delAdmin(@PathVariable("id") @Min(value = 1, message = "参数错误") Integer adminId)
-    {
+    public R delAdmin(@PathVariable("id") @Min(value = 1, message = "参数错误") Integer adminId) {
         // 无法自我删除
         if (StpUtil.getLoginIdAsInt() == adminId) {
             return R.error();
@@ -196,13 +204,12 @@ public class AdminController
     }
 
 
-
     // ===================================login===================================
-
 
 
     /**
      * 密码登录
+     *
      * @param request
      * @param username
      * @param password
@@ -211,8 +218,7 @@ public class AdminController
     @PostMapping("/login")
     public R login(HttpServletRequest request,
                    @NotBlank(message = "请输入账号") String username,
-                   @NotBlank(message = "请输入密码") String password)
-    {
+                   @NotBlank(message = "请输入密码") String password) {
         HashMap where = new HashMap<>();
         where.put("username", username);
         where.put("password", password);
@@ -247,12 +253,52 @@ public class AdminController
 
     /**
      * 退出
+     *
      * @return
      */
     @GetMapping("/logout")
-    public R logout()
-    {
+    public R logout() {
         StpUtil.logout();
         return R.success();
+    }
+
+    private static final String CUSTOMER_BASE_DIR = "D:/workSpace/audit/customers";
+
+    // 获取文件列表
+    @GetMapping("/list/file")
+    public List<String> listFiles(@RequestParam String year,
+                                  @RequestParam String identityNumber) {
+        String folderName = year + "_" + identityNumber;
+        Path folderPath = Paths.get(CUSTOMER_BASE_DIR, folderName);
+
+        List<String> files = new ArrayList<>();
+        if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
+            File[] listFiles = folderPath.toFile().listFiles((dir, name) -> name.endsWith(".xlsx") || name.endsWith(".xls"));
+            if (listFiles != null) {
+                for (File file : listFiles) {
+                    files.add(file.getName());
+                }
+            }
+        }
+        return files;
+    }
+
+    // 下载/预览文件
+    @GetMapping("/download")
+    public ResponseEntity<FileSystemResource> downloadFile(@RequestParam String year,
+                                                           @RequestParam String identityNumber,
+                                                           @RequestParam String fileName) {
+        String folderName = year + "_" + identityNumber;
+        Path filePath = Paths.get(CUSTOMER_BASE_DIR, folderName, fileName);
+
+        if (!Files.exists(filePath)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        FileSystemResource resource = new FileSystemResource(filePath.toFile());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + fileName)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 }

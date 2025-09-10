@@ -17,7 +17,7 @@ public class Menu implements Serializable
     @TableId(type = IdType.AUTO)
     private Long id;
     private String name;
-    private Integer parent_id;
+    private Integer parentId;
     private String type;
     private String path;
     private String perms;
@@ -25,7 +25,7 @@ public class Menu implements Serializable
     private Integer sort;
     private Integer status;
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date update_time;
+    private Date updateTime;
     @TableField(fill = FieldFill.INSERT)
-    private Date create_time;
+    private Date createTime;
 }
