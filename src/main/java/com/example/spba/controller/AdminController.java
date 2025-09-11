@@ -247,7 +247,7 @@ public class AdminController {
         List<Object> tree = Function.getTree(menus, 0);
         data.put("menu", tree);
         data.put("perms", perms);
-
+        data.put("identity_number", res.get("identity_number"));
         return R.success(data);
     }
 

@@ -3,7 +3,7 @@
 <mapper namespace="com.example.spba.dao.AdminMapper">
 
     <select id="getInfo" parameterType="HashMap" resultType="HashMap">
-        SELECT a.id,a.username,a.password,a.safe,a.status,a.role,
+        SELECT a.id,a.username,a.password,a.safe,a.status,a.role,a.identity_number,
         ( SELECT sum(root) FROM role WHERE JSON_CONTAINS ( a.role, CONVERT ( id, CHAR ) ) ) AS root
         FROM admin a
         <where>
@@ -14,7 +14,7 @@
     </select>
 
     <select id="getList" parameterType="HashMap" resultType="HashMap">
-        SELECT a.id,a.username,a.status,a.login_time,a.login_ip,
+        SELECT a.id,a.username,a.status,a.login_time,a.login_ip,a.identity_number,
         ( SELECT count(*) FROM login_log WHERE a.id = admin_id) AS login_count,
         ( SELECT sum(root) FROM role WHERE JSON_CONTAINS ( a.role, CONVERT ( id, CHAR ) ) ) AS root,
         ( SELECT GROUP_CONCAT( NAME SEPARATOR " | " ) FROM role WHERE JSON_CONTAINS ( a.role, CONVERT ( id, CHAR ) ) ) AS roles

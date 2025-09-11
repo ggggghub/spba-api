@@ -65,12 +65,15 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         // 更新登录信息
         updateLogin(Long.valueOf(info.get("id").toString()), params.get("ip").toString());
 
+
+
         HashMap data = new HashMap<>();
         data.put("avatar", info.get("avatar"));
         data.put("username", info.get("username"));
         data.put("token", StpUtil.getTokenValue());
         result.put("data", data);
         result.put("status", true);
+        result.put("identity_number", info.get("identity_number"));
 
         return result;
     }

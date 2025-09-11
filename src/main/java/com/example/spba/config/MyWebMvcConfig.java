@@ -1,11 +1,12 @@
 package com.example.spba.config;
 
 import com.example.spba.interceptor.SpbaInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 @Configuration
 public class MyWebMvcConfig implements WebMvcConfigurer
 {
@@ -15,6 +16,8 @@ public class MyWebMvcConfig implements WebMvcConfigurer
     {
         return new SpbaInterceptor();
     }
+    @Value("${app.upload-root}")
+    private String uploadRoot;
 
     /**
      * 拦截器
@@ -29,5 +32,11 @@ public class MyWebMvcConfig implements WebMvcConfigurer
                 .addPathPatterns("/**")
                 .excludePathPatterns("/login")
                 .excludePathPatterns("/register");
+    }
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 访问 /files/** 映射到本地磁盘
+        registry.addResourceHandler("/files/**")
+                .addResourceLocations("file:" + uploadRoot + "/");
     }
 }
