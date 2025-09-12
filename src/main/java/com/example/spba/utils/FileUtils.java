@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -74,5 +75,14 @@ public class FileUtils {
                 throw new RuntimeException("复制文件失败: " + path, e);
             }
         });
+    }
+    public static String sanitize(String s){
+        // 去除危险字符，防止路径穿越
+        return s.replaceAll("[\\\\/:*?\"<>|]", "_").trim();
+    }
+    public static Path resolveVoucherDir(Path root, String company, LocalDate date, String voucherNo){
+        return root.resolve(sanitize(company))
+                .resolve(date.toString())
+                .resolve(sanitize(voucherNo));
     }
 }

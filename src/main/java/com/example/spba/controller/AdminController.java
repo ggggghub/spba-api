@@ -83,7 +83,13 @@ public class AdminController {
             data.put("role", JSONUtil.parse(info.getRole()).toBean(List.class));
         }
 
+
         return R.success(data);
+    }
+    @GetMapping
+    public R getUserByIdentityNumber(){
+
+        return R.success("ok");
     }
 
     /**

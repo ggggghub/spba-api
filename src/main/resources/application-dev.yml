@@ -2,7 +2,9 @@
 app:
   environment: dev
   upload-root: D:/workSpace/upload
-
+storage:
+  root: D:/workSpace/audit/customers
+  templateDir: D:/workSpace/中小会计师事务所审计底稿(企业会计准则)
 server:
   port: 8082
   # 开启优雅停机
@@ -16,8 +18,8 @@ spring:
     timeout-per-shutdown-phase: 15s
   servlet:
     multipart:
-      max-file-size: 10MB      # 单个文件大小
-      max-request-size: 100MB  # 总上传的数据大小
+      max-file-size: 20MB      # 单个文件大小
+      max-request-size: 200MB  # 总上传的数据大小
   # 数据库配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
