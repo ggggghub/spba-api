@@ -74,6 +74,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         result.put("data", data);
         result.put("status", true);
         result.put("identity_number", info.get("identity_number"));
+        result.put("company_name", info.get("company_name"));
 
         return result;
     }
@@ -137,8 +138,10 @@ public boolean register(Map<String, Object> params) {
     String username = (String) params.get("username");
     String password = (String) params.get("password");
     String identityNumber = (String) params.get("identity_number");
+    String companyName = (String) params.get("company_name");
 
-    if (username == null || password == null || identityNumber == null) {
+
+    if (username == null || password == null || identityNumber == null || companyName == null) {
         throw new RuntimeException("缺少必要参数");
     }
 
@@ -154,10 +157,15 @@ public boolean register(Map<String, Object> params) {
         throw new RuntimeException("唯一识别号已存在");
     }
 
+    String str = String.valueOf(this.count(new QueryWrapper<Admin>().eq("company_name", companyName)));
+    if (Integer.parseInt(str) > 0) {
+        throw new RuntimeException("公司名已存在");
+    }
+
     // 构建 Admin
     Admin admin = new Admin();
     admin.setUsername(username);
-
+    admin.setCompanyName(companyName);
     // 生成 4 位随机 salt
     String safe = String.valueOf(System.currentTimeMillis()).substring(8, 12);
     admin.setSafe(safe);

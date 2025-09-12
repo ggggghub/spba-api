@@ -30,4 +30,5 @@ public class Admin implements Serializable
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
     private String identityNumber;
+    private String companyName;
 }
