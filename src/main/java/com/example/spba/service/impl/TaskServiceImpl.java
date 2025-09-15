@@ -23,6 +23,7 @@ public class TaskServiceImpl implements TaskService {
         task.setCompanyName(companyName);
         task.setTaskFile(taskFilePath);
         task.setTaskDate(LocalDate.now());
+        task.setState(0);
         auditTaskMapper.insert(task);
         return task;
     }

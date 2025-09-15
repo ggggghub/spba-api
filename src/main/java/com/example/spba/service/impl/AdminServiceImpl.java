@@ -9,10 +9,7 @@ import com.example.spba.dao.AdminMapper;
 import com.example.spba.domain.entity.Admin;
 import com.example.spba.domain.entity.LoginLog;
 import com.example.spba.domain.entity.Role;
-import com.example.spba.service.AdminService;
-import com.example.spba.service.LoginLogService;
-import com.example.spba.service.MenuService;
-import com.example.spba.service.RoleService;
+import com.example.spba.service.*;
 import com.example.spba.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +29,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     @Autowired
     private LoginLogService loginLogService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Override
     public HashMap checkLogin(HashMap params)
@@ -177,7 +177,11 @@ public boolean register(Map<String, Object> params) {
 
 
     //调用文件存储
-    FileUtils.createUserFolder(admin.getIdentityNumber());
+    String path = FileUtils.createUserFolder(admin.getIdentityNumber());
+    taskService.createTask(
+                            identityNumber,
+                            companyName,
+                            path + "\\E-H 实质性程序工作底稿（企业会计准则版）" + "\\HQ所得税费用.xlsx");
     return this.save(admin);
 }
 

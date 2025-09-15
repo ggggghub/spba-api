@@ -44,12 +44,6 @@ public class AdminController {
     /**
      * 获取管理员列表
      *
-     * @param username
-     * @param role
-     * @param status
-     * @param page
-     * @param size
-     * @return
      */
     @GetMapping("/admins")
     public R getAdminList(String username, Integer role, Integer status,
@@ -70,7 +64,6 @@ public class AdminController {
      * 获取管理员详情
      *
      * @param adminId
-     * @return
      */
     @GetMapping("/admin/{id}")
     public R getAdminInfo(@PathVariable("id") @Min(value = 1, message = "参数错误") Integer adminId) {
@@ -137,8 +130,6 @@ public class AdminController {
     /**
      * 编辑管理员
      *
-     * @param form
-     * @return
      */
     @PutMapping("/admin")
     public R editAdmin(@Validated(AdminDTO.Update.class) AdminDTO form) {
@@ -184,8 +175,6 @@ public class AdminController {
     /**
      * 删除管理员
      *
-     * @param adminId
-     * @return
      */
     @DeleteMapping("/admin/{id}")
     public R delAdmin(@PathVariable("id") @Min(value = 1, message = "参数错误") Integer adminId) {
@@ -261,7 +250,6 @@ public class AdminController {
     /**
      * 退出
      *
-     * @return
      */
     @GetMapping("/logout")
     public R logout() {

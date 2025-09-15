@@ -29,4 +29,6 @@ public class AuditTask {
 
     /** 创建时间 */
     private Date createdAt;
+    //状态码
+    private Integer state;
 }

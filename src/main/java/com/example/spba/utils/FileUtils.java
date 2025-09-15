@@ -43,15 +43,10 @@ public class FileUtils {
             // 复制模板目录到目标目录
             copyDirectory(Paths.get(TEMPLATE_DIR), targetDir);
 
-            return targetDir.toString();
+            // 返回完整路径
+            return targetDir.toAbsolutePath().toString();
         } catch (IOException e) {
-            System.err.println("创建用户文件夹失败: " + e.getMessage());
-            e.printStackTrace();
-            return null; // 或者抛出自定义异常
-        } catch (RuntimeException e) {
-            System.err.println("复制模板文件夹时出现错误: " + e.getMessage());
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException("创建用户文件夹失败: " + e.getMessage(), e);
         }
     }
 
