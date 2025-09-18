@@ -22,7 +22,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,42 +102,72 @@ public class VoucherFileServiceImpl extends ServiceImpl<VoucherFileMapper, Vouch
         return true;
     }
 
+
+
     @Override
     public List<AttachmentStatusResp> status(String identityNumber, String indexNo, List<String> voucherNos) {
         if (voucherNos == null || voucherNos.isEmpty()) return Collections.emptyList();
+        Set<String> wanted = voucherNos.stream().filter(Objects::nonNull).map(String::valueOf)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        // 先把请求的 voucherNo 做成 set 提高匹配效率
-        Set<String> wanted = voucherNos.stream()
-                .filter(Objects::nonNull)
-                .map(String::valueOf)
-                .collect(Collectors.toCollection(LinkedHashSet::new)); // 保持顺序
-
-        // 查出这些 voucherNo 的所有记录，按 seq 降序（第一条就是最新）
         List<VoucherFile> list = lambdaQuery()
                 .eq(VoucherFile::getIdentityNumber, identityNumber)
                 .eq(VoucherFile::getIndexNo, indexNo)
                 .in(VoucherFile::getVoucherNo, wanted)
+                .eq(VoucherFile::getDeleted, 0)
                 .orderByDesc(VoucherFile::getSeq)
                 .list();
 
-        // 取每个 voucherNo 的第一条（最新）
-        Map<String, VoucherFile> latestByVoucher =
-                list.stream()
-                        .collect(Collectors.toMap(
-                                v -> String.valueOf(v.getVoucherNo()),
-                                Function.identity(),
-                                (a, b) -> a)); // 因为已经按 seq DESC，第一次出现即最新
+        Map<String, VoucherFile> latest = new LinkedHashMap<>();
+        for (VoucherFile v : list) {
+            latest.putIfAbsent(String.valueOf(v.getVoucherNo()), v); // 第一条即最新
+        }
 
-        // 组装响应，保持与请求顺序一致
         List<AttachmentStatusResp> resp = new ArrayList<>();
         for (String vn : wanted) {
-            VoucherFile hit = latestByVoucher.get(vn);
+            VoucherFile hit = latest.get(vn);
             if (hit != null) {
-                resp.add(new AttachmentStatusResp(vn, true, hit.getFileName()));
+                resp.add(new AttachmentStatusResp(vn, true, hit.getId(), hit.getFileName(), hit.getFilePath(), hit.getValidStatus()));
             } else {
-                resp.add(new AttachmentStatusResp(vn, false, null));
+                resp.add(new AttachmentStatusResp(vn, false, null, null, null, null));
             }
         }
         return resp;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean verifyLatest(String identityNumber, String indexNo, String voucherNo, Integer validStatus, String remark, String operator) {
+        VoucherFile latest = lambdaQuery()
+                .eq(VoucherFile::getIdentityNumber, identityNumber)
+                .eq(VoucherFile::getIndexNo, indexNo)
+                .eq(VoucherFile::getVoucherNo, voucherNo)
+                .eq(VoucherFile::getDeleted, 0)
+                .orderByDesc(VoucherFile::getSeq)
+                .last("LIMIT 1").one();
+
+        if (latest == null) return false;
+
+        latest.setValidStatus(validStatus);
+        latest.setRemark(remark);
+        latest.setVerifiedBy(operator);
+        latest.setVerifiedAt(LocalDateTime.now());
+        return updateById(latest);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean adminDelete(Long id, String operator) {
+        VoucherFile vf = getById(id);
+        if (vf == null || Objects.equals(vf.getDeleted(), 1)) return true;
+
+        // 物理删除文件
+        try { Files.deleteIfExists(Paths.get(vf.getFilePath())); } catch (Exception ignore) {}
+
+        // 软删记录
+        vf.setDeleted(1);
+        vf.setDeletedAt(LocalDateTime.now());
+        vf.setDeletedBy(operator);
+        return updateById(vf);
     }
 }

@@ -14,4 +14,8 @@ public interface VoucherFileService extends IService<VoucherFile> {
     boolean removeOne(Long id);
 
     List<AttachmentStatusResp> status(String identityNumber, String indexNo, List<String> voucherNos);
+
+    // 管理相关
+    boolean verifyLatest(String identityNumber, String indexNo, String voucherNo, Integer validStatus, String remark, String operator);
+    boolean adminDelete(Long id, String operator);
 }
