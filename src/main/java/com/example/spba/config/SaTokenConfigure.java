@@ -47,6 +47,8 @@ public class SaTokenConfigure implements WebMvcConfigurer
             SaRouter.match(SaHttpMethod.PUT).match("/menu").check(r ->StpUtil.checkPermission("menu:edit"));
             SaRouter.match(SaHttpMethod.GET).match("/menu/{id}").check(r ->StpUtil.checkPermission("menu:query"));
             SaRouter.match(SaHttpMethod.DELETE).match("/menu/{id}").check(r ->StpUtil.checkPermission("menu:del"));
+
+            //SaRouter.match("/fileUpload/**").check(r -> StpUtil.checkPermission("file:upload"));
         })).addPathPatterns("/**");
     }
 }

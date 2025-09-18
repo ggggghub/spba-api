@@ -3,10 +3,12 @@ package com.example.spba.controller;
 import com.example.spba.domain.entity.AuditTask;
 import com.example.spba.service.TaskService;
 import com.example.spba.utils.ExcelParser;
+import com.example.spba.utils.FileUtils;
 import com.example.spba.utils.R;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +32,12 @@ public class TaskController {
     @GetMapping("/{identityNumber}")
     public R getTasks(@PathVariable String identityNumber) {
         List<AuditTask> tasks = taskService.getTasksByIdentity(identityNumber);
-        return R.success(tasks);
+        String taskFile = tasks.get(0).getTaskFile();
+        String[] fileNames = FileUtils.listFiles(taskFile);
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("tasks", tasks);
+        map.put("select", fileNames);
+        return R.success(map);
     }
 
     /** 解析 Excel（默认最后一个 sheet，也可指定 sheetIndex） */

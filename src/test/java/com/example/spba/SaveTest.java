@@ -102,6 +102,32 @@ public class SaveTest {
             e.printStackTrace();
         }
     }
+
+
+
+
+    public static String[] getFiles(String dirPath) {
+        Path dir = Paths.get(dirPath);
+        if (!Files.exists(dir) || !Files.isDirectory(dir)) {
+            throw new IllegalArgumentException("路径不存在或不是目录: " + dirPath);
+        }
+
+        try {
+            return Files.list(dir)
+                    .filter(Files::isRegularFile) // 只要文件，不要子目录
+                    .map(path -> path.getFileName().toString())
+                    .toArray(String[]::new);
+        } catch (IOException e) {
+            throw new RuntimeException("读取目录文件失败: " + e.getMessage(), e);
+        }
+    }
+    @Test
+    public static void main(String[] args) {
+
+        String[] files = getFiles("D:\\workSpace\\audit\\customers\\2025_321321\\E-H 实质性程序工作底稿（企业会计准则版）");
+        System.out.println(Arrays.toString(files));
+    }
+
 }
 
 

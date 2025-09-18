@@ -16,21 +16,27 @@ public class VoucherUploadController {
     @Resource
     private VoucherUploadService voucherUploadService;
 
-    /** 上传发票（用户调用，可以多文件） */
-    @PostMapping("/{taskId}/{voucherNo}/upload")
-    public R uploadFiles(@PathVariable Integer taskId,
+    /** 上传凭证附件 */
+    @PostMapping("/{identityNumber}/{voucherNo}/upload")
+    public R uploadFiles(@PathVariable String identityNumber,
                          @PathVariable String voucherNo,
-                         @RequestParam String uploader,
                          @RequestParam("files") MultipartFile[] files) {
-        List<AuditVoucherFile> list = voucherUploadService.uploadFiles(taskId, voucherNo, uploader, files);
+        List<AuditVoucherFile> list = voucherUploadService.uploadFiles(identityNumber, voucherNo, files);
         return R.success(list, "上传成功");
     }
 
     /** 查询某凭证下的上传记录 */
-    @GetMapping("/{taskId}/{voucherNo}")
-    public R getFiles(@PathVariable Integer taskId,
+    @GetMapping("/{identityNumber}/{voucherNo}")
+    public R getFiles(@PathVariable String identityNumber,
                       @PathVariable String voucherNo) {
-        List<AuditVoucherFile> list = voucherUploadService.getFiles(taskId, voucherNo);
+        List<AuditVoucherFile> list = voucherUploadService.getFiles(identityNumber, voucherNo);
+        return R.success(list);
+    }
+
+    /** 查询某企业的所有附件 */
+    @GetMapping("/identity/{identityNumber}")
+    public R getFilesByIdentity(@PathVariable String identityNumber) {
+        List<AuditVoucherFile> list = voucherUploadService.getFilesByIdentityNumber(identityNumber);
         return R.success(list);
     }
 }

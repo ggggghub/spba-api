@@ -80,4 +80,20 @@ public class FileUtils {
                 .resolve(date.toString())
                 .resolve(sanitize(voucherNo));
     }
+    public static String[] listFiles(String dirPath) {
+        Path dir = Paths.get(dirPath);
+        if (!Files.exists(dir) || !Files.isDirectory(dir)) {
+            throw new IllegalArgumentException("路径不存在或不是目录: " + dirPath);
+        }
+
+        try {
+            return Files.list(dir)
+                    .filter(Files::isRegularFile) // 只要文件，不要子目录
+                    .map(path -> path.getFileName().toString())
+                    .toArray(String[]::new);
+        } catch (IOException e) {
+            throw new RuntimeException("读取目录文件失败: " + e.getMessage(), e);
+        }
+    }
+
 }
