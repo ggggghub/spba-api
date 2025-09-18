@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.spba.dao.VoucherFileMapper">
+
+    <select id="selectMaxSeqForUpdate" resultType="java.lang.Integer">
+        SELECT COALESCE(MAX(seq), 0)
+        FROM voucher_file
+        WHERE identity_number = #{identityNumber}
+          AND index_no = #{indexNo}
+            FOR UPDATE
+    </select>
+
+</mapper>

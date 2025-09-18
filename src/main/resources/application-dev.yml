@@ -2,6 +2,8 @@
 app:
   environment: dev
   upload-root: D:/workSpace/upload
+  upload:
+    base-dir: D:/workSpace/audit/customers   # 根目录
 storage:
   root: D:/workSpace/audit/customers
   templateDir: D:/workSpace/中小会计师事务所审计底稿(企业会计准则)
