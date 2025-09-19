@@ -244,6 +244,7 @@ public class AdminController {
         data.put("perms", perms);
         data.put("identity_number", res.get("identity_number"));
         data.put("company_name", res.get("company_name"));
+        data.put("role",res.get("role"));
         return R.success(data);
     }
 

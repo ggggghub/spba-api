@@ -1,14 +1,15 @@
 # 正式环境配置
+
 app:
-  environment: pro
+  environment: dev
   upload-root: D:/workSpace/upload
   upload:
-    base-dir: D:/workSpace/audit/customers
+    base-dir: D:/workSpace/audit/customers   # 根目录
 storage:
   root: D:/workSpace/audit/customers
-    # 本地存储目录，生产环境换成合适路径
+  templateDir: D:/workSpace/中小会计师事务所审计底稿(企业会计准则)
 server:
-  port: 8083
+  port: 8082
   # 开启优雅停机
   shutdown: graceful
   servlet:
@@ -20,8 +21,8 @@ spring:
     timeout-per-shutdown-phase: 15s
   servlet:
     multipart:
-      max-file-size: 2MB      # 单个文件大小
-      max-request-size: 10MB  # 总上传的数据大小
+      max-file-size: 20MB      # 单个文件大小
+      max-request-size: 200MB  # 总上传的数据大小
   # 数据库配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -78,7 +79,9 @@ mybatis-plus:
   type-aliases-package: com.example.spba.domain.entity
   configuration:
     # 是否开启自动驼峰命名规则映射:从数据库列名到Java属性驼峰命名的类似映射
-    map-underscore-to-camel-case: false
+    map-underscore-to-camel-case: true
+    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #logging:
 #  config: classpath:log.xml
@@ -90,7 +93,7 @@ sa-token:
   # token有效期，单位s 默认30天, -1代表永不过期
   timeout: 2592000
   # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
-  activity-timeout: 900
+  activity-timeout: 9000
   # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
   is-concurrent: false
   # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)

@@ -75,6 +75,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         result.put("status", true);
         result.put("identity_number", info.get("identity_number"));
         result.put("company_name", info.get("company_name"));
+        result.put("role",info.get("role"));
 
         return result;
     }
